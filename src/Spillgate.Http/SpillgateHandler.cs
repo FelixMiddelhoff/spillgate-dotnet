@@ -93,8 +93,9 @@ public sealed class SpillgateHandler : DelegatingHandler
         }
 
         HttpResponseMessage response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
-        if (request.Method == HttpMethod.Head)
+        if (IsBodyless(request, response))
         {
+            // No body to decode, whatever Content-Encoding says: it describes the representation, not the (absent) bytes.
             return response;
         }
 
@@ -124,6 +125,16 @@ public sealed class SpillgateHandler : DelegatingHandler
             response.Dispose();
             throw;
         }
+    }
+
+    /// <summary>The responses that cannot carry a body: HEAD, 1xx, 204, 304 and an announced length of zero.</summary>
+    private static bool IsBodyless(HttpRequestMessage request, HttpResponseMessage response)
+    {
+        int status = (int)response.StatusCode;
+        return request.Method == HttpMethod.Head
+            || status is >= 100 and < 200
+            || status is 204 or 304
+            || response.Content.Headers.ContentLength == 0;
     }
 
     private static string BuildAcceptEncoding(Decoder decoder)

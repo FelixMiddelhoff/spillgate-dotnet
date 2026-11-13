@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Spillgate.Http;
@@ -16,8 +17,8 @@ public static class SpillgateExtensions
     /// reads <c>Request.Body</c> through the limits; the application sees decoded bytes and no
     /// <c>Content-Encoding</c> and no <c>Content-Length</c> header. Failures answer without echoing request data:
     /// 413 (limits), 415 (unsupported encoding), 400 (malformed or corrupt data), 500 (internal failure). A failure
-    /// after the response has started aborts the connection. Requests without <c>Content-Encoding</c> pass untouched
-    /// (the server's own body size limit applies to them).
+    /// after the response has started aborts the connection. Requests without <c>Content-Encoding</c>, and requests
+    /// without a body (<c>Content-Length: 0</c>), pass untouched (the server's own body size limit applies to them).
     /// </summary>
     /// <param name="app">The application builder.</param>
     /// <param name="decoder">The decoder with the limits and codecs to apply.</param>
@@ -49,6 +50,13 @@ public static class SpillgateExtensions
         HttpRequest request = context.Request;
         if (!request.Headers.TryGetValue("Content-Encoding", out Microsoft.Extensions.Primitives.StringValues values) || values.Count == 0)
         {
+            await next(context).ConfigureAwait(false);
+            return;
+        }
+
+        if (request.ContentLength == 0 || context.Features.Get<IHttpRequestBodyDetectionFeature>() is { CanHaveBody: false })
+        {
+            // No body at all: nothing to decode, and an empty body is not a truncated stream.
             await next(context).ConfigureAwait(false);
             return;
         }

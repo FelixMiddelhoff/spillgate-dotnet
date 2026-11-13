@@ -49,7 +49,7 @@ public sealed class MiscReview
     /// F-B (low, availability, not a limit issue): a bodyless response (304, 204) that carries a Content-Encoding header makes
     /// SpillgateHandler fail the read with corrupt (empty input is a truncated gzip) instead of returning an empty body.
     /// </summary>
-    [ReviewFact]
+    [Fact]
     public async Task BodylessResponseWithContentEncodingReadsAsEmpty()
     {
         Decoder d = R.Dec(1000);
