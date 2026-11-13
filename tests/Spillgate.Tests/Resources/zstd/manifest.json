@@ -1,0 +1,137 @@
+[
+  {
+    "name": "empty",
+    "kind": "text",
+    "seed": 1,
+    "size": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "compressed": 13,
+    "checksum": true
+  },
+  {
+    "name": "tiny",
+    "kind": "text",
+    "seed": 2,
+    "size": 1,
+    "sha256": "043a718774c572bd8a25adbeb1bfcd5c0256ae11cecf9f9c3f925d0e52beaf89",
+    "compressed": 10,
+    "checksum": false
+  },
+  {
+    "name": "small-text-l1",
+    "kind": "text",
+    "seed": 3,
+    "size": 3000,
+    "sha256": "850555eaf4d7f662b16bbf5c6505e4d45435a51709a10c2f73490f51d3c99e79",
+    "compressed": 724,
+    "checksum": false
+  },
+  {
+    "name": "small-text-l3-ck",
+    "kind": "text",
+    "seed": 4,
+    "size": 5000,
+    "sha256": "2b400e5dafd8335bd5707c2c63647eadb3278be2e50371ac3c7c15b861b58d5e",
+    "compressed": 1061,
+    "checksum": true
+  },
+  {
+    "name": "text-l1",
+    "kind": "text",
+    "seed": 5,
+    "size": 400000,
+    "sha256": "9eb831a71f583b27a7c7c5b49d35397d496ac143a992c7c117adabf3ba978856",
+    "compressed": 75333,
+    "checksum": true
+  },
+  {
+    "name": "text-l3",
+    "kind": "text",
+    "seed": 6,
+    "size": 400000,
+    "sha256": "8253af38f83b940d59756ae90e5f4651a3675f52d253b5ce29cabac3def326e1",
+    "compressed": 70580,
+    "checksum": false
+  },
+  {
+    "name": "text-l9-ck",
+    "kind": "text",
+    "seed": 7,
+    "size": 300000,
+    "sha256": "59fe28fb0d51ec2a444a83a3cc4c1444255b3344615265614c618fc2dd1bcfb7",
+    "compressed": 46033,
+    "checksum": true
+  },
+  {
+    "name": "text-l19",
+    "kind": "text",
+    "seed": 8,
+    "size": 300000,
+    "sha256": "07099a101902a26db52959d3f34a3d61dd1f6d281088ee60028612552f8ce567",
+    "compressed": 35876,
+    "checksum": true
+  },
+  {
+    "name": "records-l3",
+    "kind": "records",
+    "seed": 9,
+    "size": 300000,
+    "sha256": "7f2e20ef8c97ddf4e0ea71986647a11961a09015a49fe8ebbbe054bc478695a2",
+    "compressed": 83046,
+    "checksum": true
+  },
+  {
+    "name": "records-l15",
+    "kind": "records",
+    "seed": 10,
+    "size": 300000,
+    "sha256": "5da6a8c4336eb6f7e37934bdcea71b665ca48ff9f65afeb856e61aada883a483",
+    "compressed": 81423,
+    "checksum": false
+  },
+  {
+    "name": "random-l3",
+    "kind": "random",
+    "seed": 11,
+    "size": 200000,
+    "sha256": "97ca86bac3a100ae3553051e58b00c67d99428a4f1af57998b0bf7970fbf0721",
+    "compressed": 200019,
+    "checksum": true
+  },
+  {
+    "name": "zeros-l3",
+    "kind": "zeros",
+    "seed": 12,
+    "size": 600000,
+    "sha256": "1358f4ce65f0d1ed482d572e4eac6ea90d465c0ab878f477297474f8f23226c3",
+    "compressed": 42,
+    "checksum": true
+  },
+  {
+    "name": "mixed-l5",
+    "kind": "mixed",
+    "seed": 13,
+    "size": 450000,
+    "sha256": "82003d25098e0737ad184b8d4de00935488e963cddc674ac4b8c6823b79cfdcf",
+    "compressed": 220251,
+    "checksum": true
+  },
+  {
+    "name": "mixed-l22-ck",
+    "kind": "mixed",
+    "seed": 14,
+    "size": 450000,
+    "sha256": "2de96256e347ec3871b8bd1580e7964b185f70cc473bd5603507bf036b860dd7",
+    "compressed": 201893,
+    "checksum": true
+  },
+  {
+    "name": "text-l1-stream",
+    "kind": "text",
+    "seed": 15,
+    "size": 350000,
+    "sha256": "9b1860941fe8f897b7a06ee68f5fde9675e14d26075df90b11369d1baf677669",
+    "compressed": 65820,
+    "checksum": true
+  }
+]

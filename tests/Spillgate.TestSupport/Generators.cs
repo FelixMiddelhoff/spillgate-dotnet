@@ -328,6 +328,9 @@ public static class Generators
         }
     }
 
+    /// <summary>A gzip, zlib ("zlib") or raw deflate ("raw") zeros bomb of 1 + 258 * matches decoded bytes.</summary>
+    public static byte[] ZerosOf(string codec, long matches) => ZerosStream(codec, matches);
+
     public static string Sha256Hex(byte[] payload) => Convert.ToHexString(SHA256.HashData(payload)).ToLowerInvariant();
 
     public static string HexOf(byte[] bytes) => Convert.ToHexString(bytes).ToLowerInvariant();
