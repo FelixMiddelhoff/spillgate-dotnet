@@ -18,7 +18,7 @@ public sealed class ResourceReview
     private readonly ITestOutputHelper _out;
     public ResourceReview(ITestOutputHelper o) { _out = o; }
 
-    private static readonly string[] CodeLengthOrder = { };
+    private static readonly string[] CodeLengthOrder = Array.Empty<string>();
 
     private (double ms, double nsPerByte, long alloc, long delivered, string outcome) Measure(string name, byte[] input, string enc, Decoder d)
     {

@@ -56,7 +56,7 @@ public sealed class FuzzReview
 
         switch (codec)
         {
-            case "gzip": l.Add((Generators.Concat(R.Gzip(R.Text(100, 5)), R.Gzip(new byte[0]), R.Gzip(R.Text(500, 6))), new[] { "gzip" })); l.Add((Generators.GzipStored(R.Text(3000, 8)), new[] { "gzip" })); break;
+            case "gzip": l.Add((Generators.Concat(R.Gzip(R.Text(100, 5)), R.Gzip(Array.Empty<byte>()), R.Gzip(R.Text(500, 6))), new[] { "gzip" })); l.Add((Generators.GzipStored(R.Text(3000, 8)), new[] { "gzip" })); break;
             case "deflate": l.Add((Generators.ZlibStored(R.Text(3000, 8)), new[] { "deflate" })); l.Add((Generators.StoredDeflate(R.Text(3000, 8)), new[] { "deflate" })); break;
             case "br": l.Add((Generators.BrotliStored(R.Text(5000, 9), 16), new[] { "br" })); l.Add((Generators.BrotliZeros(70000, 22), new[] { "br" })); l.Add((Generators.BrotliZeros(70000, 10), new[] { "br" })); break;
             case "zstd":

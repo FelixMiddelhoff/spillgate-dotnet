@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased (intended as 0.1.0)
+## 0.1.0 - 2026-11-13
 
 First release of the .NET implementation of spillgate.
 
