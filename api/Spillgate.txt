@@ -25,6 +25,7 @@ sealed class Spillgate.Decoder
   DecodedStream Open(Stream source, IEnumerable`1 contentEncoding, Boolean leaveOpen, CancellationToken cancellationToken)
   DecodedStream Open(Stream source, String[] contentEncoding)
   ValueTask`1 DecodeAllAsync(Stream source, IEnumerable`1 contentEncoding, CancellationToken cancellationToken)
+  property IReadOnlyCollection`1 SupportedEncodings { get; }
   static Decoder Create(Limits limits)
   static DecoderBuilder CreateBuilder(Limits limits)
 sealed class Spillgate.DecoderBuilder

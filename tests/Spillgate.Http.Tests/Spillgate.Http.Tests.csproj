@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Spillgate.Http.Tests</RootNamespace>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\..\src\Spillgate\Spillgate.csproj" />
+    <ProjectReference Include="..\..\src\Spillgate.Brotli\Spillgate.Brotli.csproj" />
+    <ProjectReference Include="..\..\src\Spillgate.Zstd\Spillgate.Zstd.csproj" />
+    <ProjectReference Include="..\..\src\Spillgate.Http\Spillgate.Http.csproj" />
+    <ProjectReference Include="..\Spillgate.TestSupport\Spillgate.TestSupport.csproj" />
+  </ItemGroup>
+</Project>

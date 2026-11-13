@@ -1,0 +1,14 @@
+static class Spillgate.Http.SpillgateExtensions
+  static IApplicationBuilder UseSpillgateRequestDecoding(IApplicationBuilder app, Decoder decoder)
+  static IHttpClientBuilder AddSpillgateDecoding(IHttpClientBuilder builder, Decoder decoder)
+sealed class Spillgate.Http.SpillgateHandler : System.IDisposable, System.Net.Http.DelegatingHandler
+  ctor(Decoder decoder)
+  ctor(Decoder decoder, HttpMessageHandler innerHandler)
+  protected Task`1 SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+  static HttpMessageHandler CreateTransport()
+  static Void RequireNoAutomaticDecompression(HttpMessageHandler handler)
+static class Spillgate.Http.SpillgateHttpClient
+  static HttpClient Create(Decoder decoder)
+static class Spillgate.Http.SpillgateHttpErrors
+  static Nullable`1 ToStatusCode(Exception exception)
+  static SpillgateException Find(Exception exception)

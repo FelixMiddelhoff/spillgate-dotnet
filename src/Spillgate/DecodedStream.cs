@@ -55,6 +55,9 @@ public sealed class DecodedStream : Stream
         set => throw new NotSupportedException();
     }
 
+    /// <summary>Gets the terminal failure, if the stream has failed. For adapters whose callers swallow read exceptions.</summary>
+    internal Exception? Failure => _state == 2 ? _error : null;
+
     private bool IsDisposed => Volatile.Read(ref _disposed) != 0;
 
     /// <inheritdoc />

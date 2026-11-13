@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,12 +16,19 @@ public sealed class Decoder
 {
     private readonly EffectiveLimits _limits;
     private readonly Dictionary<string, ICodec> _codecs;
+    private string[]? _supported;
 
     internal Decoder(EffectiveLimits limits, Dictionary<string, ICodec> codecs)
     {
         _limits = limits;
         _codecs = codecs;
     }
+
+    /// <summary>
+    /// Gets the Content-Encoding tokens this decoder decodes, lower case and sorted (identity, gzip, deflate and the
+    /// registered codecs; the alias x-gzip is accepted but not listed). Use it to build an Accept-Encoding header.
+    /// </summary>
+    public IReadOnlyCollection<string> SupportedEncodings => _supported ??= _codecs.Keys.OrderBy(k => k, StringComparer.Ordinal).ToArray();
 
     /// <summary>Creates a decoder for gzip, deflate and identity with the given limits.</summary>
     /// <param name="limits">The limits.</param>
