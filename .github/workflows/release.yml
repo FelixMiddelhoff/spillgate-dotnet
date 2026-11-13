@@ -1,0 +1,89 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: "1"
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+          dotnet-version: |
+            8.0.x
+      - name: Tag equals package version
+        id: version
+        run: |
+          version="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/Directory.Build.props | head -1)"
+          if [ "v$version" != "${GITHUB_REF_NAME}" ]; then
+            echo "tag ${GITHUB_REF_NAME} does not match package version v$version"; exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - run: dotnet build --configuration Release
+      - name: Full test suite on both frameworks
+        env:
+          SPILLGATE_FUZZ_SECONDS: "120"
+        run: |
+          dotnet test --configuration Release --no-build --framework net8.0
+          dotnet test --configuration Release --no-build --framework net10.0
+      - run: dotnet pack Spillgate.sln --configuration Release --no-build --output artifacts/packages
+      - name: Consumer smoke test from the local feed
+        run: scripts/consumer-smoke.sh artifacts/packages
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: packages
+          path: |
+            artifacts/packages/*.nupkg
+            artifacts/packages/*.snupkg
+          if-no-files-found: error
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          dotnet-version: |
+            8.0.x
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: packages
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: packages/*.nupkg
+      - name: Exchange the GitHub token for a short-lived nuget.org key (trusted publishing)
+        id: login
+        if: ${{ vars.NUGET_USER != '' }}
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+      - name: Push (no --skip-duplicate: an existing version is an error)
+        env:
+          KEY_FROM_LOGIN: ${{ steps.login.outputs.NUGET_API_KEY }}
+          KEY_FALLBACK: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          key="${KEY_FROM_LOGIN:-$KEY_FALLBACK}"
+          if [ -z "$key" ]; then echo "no nuget.org credentials (see RELEASING.md)"; exit 1; fi
+          for p in packages/*.nupkg; do
+            dotnet nuget push "$p" --api-key "$key" --source https://api.nuget.org/v3/index.json
+          done

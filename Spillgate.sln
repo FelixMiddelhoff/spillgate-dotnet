@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spillgate.Http", "src\Spill
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spillgate.Http.Tests", "tests\Spillgate.Http.Tests\Spillgate.Http.Tests.csproj", "{F578181D-C969-417B-A0E7-456BC9EBDF5E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spillgate.HowTo.Tests", "tests\Spillgate.HowTo.Tests\Spillgate.HowTo.Tests.csproj", "{40A2EF60-E459-444D-91C6-B1B0229C0CF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,18 @@ Global
 		{F578181D-C969-417B-A0E7-456BC9EBDF5E}.Release|x64.Build.0 = Release|Any CPU
 		{F578181D-C969-417B-A0E7-456BC9EBDF5E}.Release|x86.ActiveCfg = Release|Any CPU
 		{F578181D-C969-417B-A0E7-456BC9EBDF5E}.Release|x86.Build.0 = Release|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Debug|x64.Build.0 = Debug|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Debug|x86.Build.0 = Debug|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Release|x64.ActiveCfg = Release|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Release|x64.Build.0 = Release|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Release|x86.ActiveCfg = Release|Any CPU
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,5 +171,6 @@ Global
 		{EB52CCB7-2552-4FA9-ACBF-155EC678E621} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{A202640D-8D20-455A-A7A4-ECAA44F4A761} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{F578181D-C969-417B-A0E7-456BC9EBDF5E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{40A2EF60-E459-444D-91C6-B1B0229C0CF6} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,35 @@
+name: nightly-fuzz
+
+on:
+  schedule:
+    - cron: "41 2 * * *"
+  workflow_dispatch:
+    inputs:
+      seconds:
+        description: "Seconds of randomized testing per test"
+        default: "1200"
+
+permissions:
+  contents: read
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+          dotnet-version: |
+            8.0.x
+      - run: dotnet build tests/Spillgate.Tests --configuration Release
+      - name: Randomized tests with a fresh seed
+        env:
+          SPILLGATE_FUZZ_SECONDS: ${{ github.event.inputs.seconds || '1200' }}
+        run: |
+          export SPILLGATE_FUZZ_SEED="$(date +%s)"
+          echo "seed $SPILLGATE_FUZZ_SEED"
+          dotnet test tests/Spillgate.Tests --configuration Release --no-build --framework net8.0 --filter "FullyQualifiedName~FuzzTests"
