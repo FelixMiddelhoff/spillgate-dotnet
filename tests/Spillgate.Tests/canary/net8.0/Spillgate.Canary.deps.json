@@ -1,0 +1,87 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "Spillgate.Canary/1.0.0": {
+        "dependencies": {
+          "Spillgate": "0.1.0",
+          "Spillgate.Brotli": "0.1.0",
+          "Spillgate.TestSupport": "1.0.0",
+          "Spillgate.Zstd": "0.1.0"
+        },
+        "runtime": {
+          "Spillgate.Canary.dll": {}
+        }
+      },
+      "Spillgate/0.1.0": {
+        "runtime": {
+          "Spillgate.dll": {
+            "assemblyVersion": "0.1.0.0",
+            "fileVersion": "0.1.0.0"
+          }
+        }
+      },
+      "Spillgate.Brotli/0.1.0": {
+        "dependencies": {
+          "Spillgate": "0.1.0"
+        },
+        "runtime": {
+          "Spillgate.Brotli.dll": {
+            "assemblyVersion": "0.1.0.0",
+            "fileVersion": "0.1.0.0"
+          }
+        }
+      },
+      "Spillgate.TestSupport/1.0.0": {
+        "runtime": {
+          "Spillgate.TestSupport.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "Spillgate.Zstd/0.1.0": {
+        "dependencies": {
+          "Spillgate": "0.1.0"
+        },
+        "runtime": {
+          "Spillgate.Zstd.dll": {
+            "assemblyVersion": "0.1.0.0",
+            "fileVersion": "0.1.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Spillgate.Canary/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spillgate/0.1.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spillgate.Brotli/0.1.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spillgate.TestSupport/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Spillgate.Zstd/0.1.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

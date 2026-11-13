@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Spillgate.Brotli</name>
+    </assembly>
+    <members>
+        <member name="T:Spillgate.Brotli.BrotliCodec">
+            <summary>
+            The brotli codec (RFC 7932) on the decoder of the .NET runtime (System.IO.Compression.BrotliDecoder), with
+            Spillgate's own framing: the window is read from the first byte and checked against the cap before any
+            decoding (SG-R-CDC-04, large-window streams are <see cref="F:Spillgate.ErrorKind.MemoryLimit"/>), the input is handed over
+            in exact steps so consumption is counted where the decoder takes bytes, and bytes after the last meta-block
+            are corrupt. The decoder of the runtime is native code; docs/threat-model.md names the patch level it needs.
+            </summary>
+        </member>
+        <member name="M:Spillgate.Brotli.BrotliCodec.Create(Spillgate.Brotli.BrotliOptions)">
+            <summary>Creates the codec.</summary>
+            <param name="options">The options, or <see langword="null"/> for the defaults.</param>
+            <returns>The codec, to register as <c>br</c>.</returns>
+            <exception cref="T:Spillgate.SpillgateException">Kind <see cref="F:Spillgate.ErrorKind.InvalidOption"/>: the window cap is out of range.</exception>
+        </member>
+        <member name="M:Spillgate.Brotli.BrotliCodec.CreateDecoder">
+            <inheritdoc />
+        </member>
+        <member name="F:Spillgate.Brotli.BrotliCodec.Adapter.Step">
+            <summary>
+            The decoder gets its input in steps of exactly this many bytes (plus the end of the input and the
+            MaxInput boundary). The native decoder flushes output when it runs out of input and loses what it decoded in
+            a call that fails, so how the stream is cut into calls decides which bytes are delivered before an error.
+            Cutting it at fixed offsets makes the result independent of the source's chunking (SG-I-09).
+            </summary>
+        </member>
+        <member name="M:Spillgate.Brotli.BrotliCodec.Adapter.CheckWindow(System.Byte)">
+            <summary>SG-R-CDC-04: the window is announced by the first bits of the stream.</summary>
+        </member>
+        <member name="T:Spillgate.Brotli.BrotliDecoderBuilderExtensions">
+            <summary>Registers brotli on a <see cref="T:Spillgate.DecoderBuilder"/>.</summary>
+        </member>
+        <member name="M:Spillgate.Brotli.BrotliDecoderBuilderExtensions.AddBrotli(Spillgate.DecoderBuilder,Spillgate.Brotli.BrotliOptions)">
+            <summary>Registers the <c>br</c> token with a brotli codec.</summary>
+            <param name="builder">The builder.</param>
+            <param name="options">The options, or <see langword="null"/> for the defaults.</param>
+            <returns>The builder.</returns>
+        </member>
+        <member name="T:Spillgate.Brotli.BrotliOptions">
+            <summary>Options of the brotli codec. Immutable.</summary>
+        </member>
+        <member name="F:Spillgate.Brotli.BrotliOptions.DefaultMaxWindowBits">
+            <summary>The format's largest window, 2^24 - 16 bytes (RFC 7932). It is the default cap (SG-R-CDC-04).</summary>
+        </member>
+        <member name="F:Spillgate.Brotli.BrotliOptions.MinWindowBits">
+            <summary>The smallest cap that can be set.</summary>
+        </member>
+        <member name="P:Spillgate.Brotli.BrotliOptions.Default">
+            <summary>Gets the default options (window cap 24 bits).</summary>
+        </member>
+        <member name="P:Spillgate.Brotli.BrotliOptions.MaxWindowBits">
+            <summary>Gets the largest window the codec accepts, as window bits (10 to 24). A stream that needs more is <see cref="F:Spillgate.ErrorKind.MemoryLimit"/>.</summary>
+        </member>
+        <member name="M:Spillgate.Brotli.BrotliOptions.Create(System.Int32)">
+            <summary>Options with a window cap in bits. The window is 2^bits - 16 bytes. The range is checked by <see cref="M:Spillgate.Brotli.BrotliCodec.Create(Spillgate.Brotli.BrotliOptions)"/>.</summary>
+            <param name="maxWindowBits">10 to 24.</param>
+            <returns>New options.</returns>
+        </member>
+    </members>
+</doc>

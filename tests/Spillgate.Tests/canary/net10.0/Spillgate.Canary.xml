@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Spillgate.Canary</name>
+    </assembly>
+    <members>
+        <member name="T:Spillgate.Canary.Program">
+            <summary>
+            Decodes a virtual bomb of the given size and prints what it cost: the peak working set of this process, the
+            bytes allocated on the managed heap, the outcome and the bytes delivered. The resource tests start it as a
+            child process, with a hard limit on the garbage collected heap, so a decoder that buffers the output fails
+            there and not only in a measurement.
+            </summary>
+        </member>
+    </members>
+</doc>

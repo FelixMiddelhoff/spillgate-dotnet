@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Spillgate.Zstd</name>
+    </assembly>
+    <members>
+        <member name="T:Spillgate.Zstd.BitStreams">
+            <summary>Bit readers over a byte range, forward (FSE headers) and backward (FSE, Huffman and sequence streams).</summary>
+        </member>
+        <member name="M:Spillgate.Zstd.BitStreams.BitsAt(System.Byte[],System.Int32,System.Int32,System.Int64,System.Int32)">
+            <summary>Reads n (at most 32) bits at bit position pos of a[from..to); bytes past the end read as zero.</summary>
+        </member>
+        <member name="P:Spillgate.Zstd.BitStreams.Backward.Remaining">
+            <summary>Gets or sets the number of bits not yet read. May go negative on a corrupt stream.</summary>
+        </member>
+        <member name="T:Spillgate.Zstd.Err">
+            <summary>Errors of the zstd decoder, with the prefix that names the codec.</summary>
+        </member>
+        <member name="T:Spillgate.Zstd.Scratch">
+            <summary>Reusable block buffers. Sizes follow the bytes that arrived, never a declared size, and stay under 128 KiB each.</summary>
+        </member>
+        <member name="T:Spillgate.Zstd.Frame">
+            <summary>One zstd frame: window, repeat offsets, carried-over tables, and the decoding of compressed blocks.</summary>
+        </member>
+        <member name="P:Spillgate.Zstd.Frame.BlockLimit">
+            <summary>The largest block this frame may contain: the window or 128 KiB, whichever is smaller.</summary>
+        </member>
+        <member name="T:Spillgate.Zstd.Fse">
+            <summary>Finite State Entropy tables (RFC 8878 section 4.1).</summary>
+        </member>
+        <member name="T:Spillgate.Zstd.Huffman">
+            <summary>Huffman literal trees (RFC 8878 section 4.2).</summary>
+        </member>
+        <member name="T:Spillgate.Zstd.Window">
+            <summary>
+            The decoder window: a ring of the last <c>windowSize</c> bytes. It grows with the bytes that were really
+            produced (never from the declared size) up to the size the frame header announced and the cap allowed.
+            </summary>
+        </member>
+        <member name="M:Spillgate.Zstd.Window.CopyHistory(System.Int32,System.Int32,System.Byte[],System.Int32)">
+            <summary>Copies n bytes that lie d bytes before the end of the history into output at outPos.</summary>
+        </member>
+        <member name="T:Spillgate.Zstd.Xxh64">
+            <summary>XXH64 with seed 0, as the zstd content checksum uses it (low 32 bits).</summary>
+        </member>
+        <member name="T:Spillgate.Zstd.ZstdCodec">
+            <summary>
+            A managed Zstandard decoder (RFC 8878, RFC 9659). It checks the frame header (window against the cap,
+            dictionary id, reserved bits) before it allocates anything, decodes block by block with buffers that follow the
+            bytes that arrived, verifies the content checksum, and treats anything after the last frame as corrupt.
+            It contains no unsafe code and does not depend on the zstd of any runtime.
+            </summary>
+        </member>
+        <member name="M:Spillgate.Zstd.ZstdCodec.Create(Spillgate.Zstd.ZstdOptions)">
+            <summary>Creates the codec.</summary>
+            <param name="options">The options, or <see langword="null"/> for the defaults.</param>
+            <returns>The codec, to register as <c>zstd</c>.</returns>
+            <exception cref="T:Spillgate.SpillgateException">Kind <see cref="F:Spillgate.ErrorKind.InvalidOption"/>: the window cap is out of range.</exception>
+        </member>
+        <member name="M:Spillgate.Zstd.ZstdCodec.CreateDecoder">
+            <inheritdoc />
+        </member>
+        <member name="T:Spillgate.Zstd.ZstdDecoder">
+            <summary>The push-style frame reader: accumulates headers and blocks from the input a step at a time.</summary>
+        </member>
+        <member name="M:Spillgate.Zstd.ZstdDecoder.Take(System.ReadOnlySpan{System.Byte},System.Int32@,System.Int32)">
+            <summary>Collects bytes into the small buffer until it holds <paramref name="total"/> bytes.</summary>
+        </member>
+        <member name="M:Spillgate.Zstd.ZstdDecoder.ReadBlockBody(System.ReadOnlySpan{System.Byte},System.Int32@)">
+            <summary>Accumulates the block body. Returns true when the block is complete and decoded into the output buffer.</summary>
+        </member>
+        <member name="T:Spillgate.Zstd.ZstdDecoderBuilderExtensions">
+            <summary>Registers zstd on a <see cref="T:Spillgate.DecoderBuilder"/>.</summary>
+        </member>
+        <member name="M:Spillgate.Zstd.ZstdDecoderBuilderExtensions.AddZstd(Spillgate.DecoderBuilder,Spillgate.Zstd.ZstdOptions)">
+            <summary>Registers the <c>zstd</c> token with a zstd codec.</summary>
+            <param name="builder">The builder.</param>
+            <param name="options">The options, or <see langword="null"/> for the defaults.</param>
+            <returns>The builder.</returns>
+        </member>
+        <member name="T:Spillgate.Zstd.ZstdOptions">
+            <summary>Options of the zstd codec. Immutable.</summary>
+        </member>
+        <member name="F:Spillgate.Zstd.ZstdOptions.DefaultMaxWindowBytes">
+            <summary>The default window cap, 8 MiB: at least the 8 MB that RFC 9659 requires decoders to support (SG-R-CDC-05).</summary>
+        </member>
+        <member name="P:Spillgate.Zstd.ZstdOptions.Default">
+            <summary>Gets the default options (window cap 8 MiB).</summary>
+        </member>
+        <member name="P:Spillgate.Zstd.ZstdOptions.MaxWindowBytes">
+            <summary>Gets the largest window, in bytes, a frame may announce. A frame that needs more is <see cref="F:Spillgate.ErrorKind.MemoryLimit"/>.</summary>
+        </member>
+        <member name="M:Spillgate.Zstd.ZstdOptions.Create(System.Int64)">
+            <summary>Options with a window cap. The range (1 KiB to 1 GiB) is checked by <see cref="M:Spillgate.Zstd.ZstdCodec.Create(Spillgate.Zstd.ZstdOptions)"/>.</summary>
+            <param name="maxWindowBytes">The cap in bytes.</param>
+            <returns>New options.</returns>
+        </member>
+    </members>
+</doc>
