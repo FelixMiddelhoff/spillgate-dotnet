@@ -21,7 +21,6 @@ public sealed class FuzzReview
     private readonly ITestOutputHelper _out;
     public FuzzReview(ITestOutputHelper o) { _out = o; }
 
-    public static int KnownBrotliBcl;
 
     private static int Cases => int.TryParse(Environment.GetEnvironmentVariable("SPILLGATE_REVIEW_CASES"), out int c) ? c : 4000;
 
@@ -156,7 +155,6 @@ public sealed class FuzzReview
             }
         });
         foreach (var kv in kinds.OrderBy(k => k.Key)) _out.WriteLine($"{codec}: {kv.Key} = {kv.Value}");
-        _out.WriteLine("known brotli F-A mismatches seen so far: " + KnownBrotliBcl);
         Assert.True(failures.IsEmpty, string.Join("\n", failures.Take(12)));
     }
 
@@ -173,15 +171,7 @@ public sealed class FuzzReview
     {
         string ka = a.Err is SpillgateException x ? x.Kind.ToString() : (a.Err == null ? "ok" : a.Err.GetType().Name);
         string kb = b.Err is SpillgateException y ? y.Kind.ToString() : (b.Err == null ? "ok" : b.Err.GetType().Name);
-        bool brotliLike = tag.StartsWith("br") || tag.StartsWith("chain");
         bool prefix = a.Data.Length <= b.Data.Length ? b.Data.AsSpan(0, a.Data.Length).SequenceEqual(a.Data) : a.Data.AsSpan(0, b.Data.Length).SequenceEqual(b.Data);
-        bool corruptInvolved = ka == "Corrupt" || kb == "Corrupt";
-        if (brotliLike && corruptInvolved && prefix && Environment.GetEnvironmentVariable("SPILLGATE_REVIEW") != "1")
-        {
-            Interlocked.Increment(ref KnownBrotliBcl);
-            return; // finding F-A, proven by BrotliReview.DeliveredPrefixDependsOnReadSize
-        }
-
         if (ratio && (ka == "RatioLimit" || kb == "RatioLimit") && prefix) return; // RDR-01: ratio near threshold may flip with step sizes
         if (ka != kb) { f.Enqueue($"{tag} outcome differs: {ka} ({a.Data.Length}B) vs {kb} ({b.Data.Length}B)"); return; }
         if (ka == "RatioLimit")

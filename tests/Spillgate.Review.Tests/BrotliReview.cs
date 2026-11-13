@@ -21,10 +21,10 @@ public sealed class BrotliReview
         R.Run(R.Dec(max), new R.Chunked(Corrupt21, () => chunk), new[] { "br" }, R.Modes[mode]);
 
     /// <summary>
-    /// F-A (medium, SG-R-RDR-01, SG-I-09): the bytes delivered before a corrupt error depend on the caller's read size
-    /// (3071 bytes with 1-byte reads, 3056 with 16-byte reads, 0 with 4096 and larger). The spec allows this only for ratio_limit.
+    /// F-A (fixed): the bytes delivered before a corrupt error must not depend on the caller's read size
+    /// (before the fix: 3071 bytes with 1-byte reads, 3056 with 16-byte reads, 0 with 4096 and larger). The spec allows this only for ratio_limit.
     /// </summary>
-    [ReviewFact]
+    [Fact]
     [Covers("SG-R-RDR-01", "SG-I-09")]
     public void DeliveredPrefixDependsOnReadSize()
     {
@@ -46,7 +46,7 @@ public sealed class BrotliReview
     /// (65537 bytes), with 4096-byte and larger reads it is corrupt (65536 bytes). RDR-01 allows only the prefix length to vary
     /// for ratio_limit, not the class. (output_limit vs corrupt did not flip in a sweep of every MaxOutput 1..3100.)
     /// </summary>
-    [ReviewFact]
+    [Fact]
     [Covers("SG-R-RDR-01", "SG-R-LAY-07")]
     public void OutcomeClassDependsOnReadSize()
     {
