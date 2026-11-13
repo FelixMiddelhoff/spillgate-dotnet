@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Spillgate.Zstd</RootNamespace>
+    <AssemblyName>Spillgate.Zstd</AssemblyName>
+    <Description>Zstandard codec for Spillgate: a managed decoder with window, dictionary and frame checks before any allocation.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Spillgate\Spillgate.csproj" />
+    <InternalsVisibleTo Include="Spillgate.Tests" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,25 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsPackable>true</IsPackable>
+    <Version>0.1.0</Version>
+    <Authors>Felix Middelhoff</Authors>
+    <Copyright>Copyright (c) 2026 Felix Middelhoff</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/FelixMiddelhoff/spillgate-dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/FelixMiddelhoff/spillgate-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>decompression;zip-bomb;gzip;brotli;zstd;security;content-encoding</PackageTags>
+    <PackageOutputPath>$(RepoRoot)artifacts/packages</PackageOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildProjectDirectory)/README.md" Pack="true" PackagePath="/" Condition="Exists('$(MSBuildProjectDirectory)/README.md')" />
+  </ItemGroup>
+</Project>

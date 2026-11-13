@@ -1,0 +1,75 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.{csproj,props,targets,yml,yaml,json,md}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+dotnet_sort_system_directives_first = true
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_using_directive_placement = outside_namespace:warning
+csharp_new_line_before_open_brace = all
+csharp_prefer_braces = true:warning
+dotnet_diagnostic.IDE0005.severity = warning
+dotnet_diagnostic.IDE0290.severity = none
+dotnet_diagnostic.IDE0058.severity = none
+dotnet_diagnostic.IDE0022.severity = none
+# Arithmetic on sizes and bit buffers is checked by tests, not by the compiler.
+dotnet_diagnostic.CA1812.severity = none
+
+# Test and support projects: relax rules that only matter for a shipped API.
+[tests/**.cs]
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.CA1515.severity = none
+dotnet_diagnostic.CA1062.severity = none
+dotnet_diagnostic.CA1812.severity = none
+dotnet_diagnostic.CA1819.severity = none
+dotnet_diagnostic.CA1002.severity = none
+dotnet_diagnostic.CA1051.severity = none
+dotnet_diagnostic.CA1000.severity = none
+dotnet_diagnostic.CA2201.severity = none
+dotnet_diagnostic.CA1308.severity = none
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1031.severity = none
+dotnet_diagnostic.CA1303.severity = none
+dotnet_diagnostic.CA1822.severity = none
+dotnet_diagnostic.CA5394.severity = none
+dotnet_diagnostic.CA2000.severity = none
+dotnet_diagnostic.CA1852.severity = none
+dotnet_diagnostic.CA1814.severity = none
+dotnet_diagnostic.CA1032.severity = none
+dotnet_diagnostic.CA1711.severity = none
+dotnet_diagnostic.CA2234.severity = none
+dotnet_diagnostic.CA1849.severity = none
+dotnet_diagnostic.CA1859.severity = none
+dotnet_diagnostic.CA1847.severity = none
+dotnet_diagnostic.CA1869.severity = none
+dotnet_diagnostic.CA1310.severity = none
+dotnet_diagnostic.CA1304.severity = none
+dotnet_diagnostic.CA1806.severity = none
+dotnet_diagnostic.CA1873.severity = none
+dotnet_diagnostic.CA1816.severity = none
+dotnet_diagnostic.CA1001.severity = none
+dotnet_diagnostic.CA2012.severity = none
+dotnet_diagnostic.CA1835.severity = none
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1720.severity = none
+dotnet_diagnostic.CA1008.severity = none
+dotnet_diagnostic.CA1034.severity = none
+dotnet_diagnostic.CA1065.severity = none
+dotnet_diagnostic.CA2000.severity = none
+dotnet_diagnostic.CA1054.severity = none
+dotnet_diagnostic.CA1056.severity = none
+dotnet_diagnostic.CA1869.severity = none

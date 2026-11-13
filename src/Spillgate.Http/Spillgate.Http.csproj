@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Spillgate.Http</RootNamespace>
+    <AssemblyName>Spillgate.Http</AssemblyName>
+    <Description>HttpClient handler and ASP.NET Core middleware that decode Content-Encoding through Spillgate limits.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\Spillgate\Spillgate.csproj" />
+    <InternalsVisibleTo Include="Spillgate.Http.Tests" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Spillgate</RootNamespace>
+    <AssemblyName>Spillgate</AssemblyName>
+    <Description>Decodes untrusted gzip, deflate and identity data (HTTP Content-Encoding and raw streams) under mandatory limits: output size, expansion ratio, chain length, input size. Zero dependencies.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Spillgate.Tests" />
+    <InternalsVisibleTo Include="Spillgate.Conformance.Tests" />
+    <InternalsVisibleTo Include="Spillgate.Brotli" />
+    <InternalsVisibleTo Include="Spillgate.Zstd" />
+    <InternalsVisibleTo Include="Spillgate.Http" />
+  </ItemGroup>
+</Project>

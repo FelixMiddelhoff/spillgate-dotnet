@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>Spillgate.Brotli</RootNamespace>
+    <AssemblyName>Spillgate.Brotli</AssemblyName>
+    <Description>Brotli codec for Spillgate, built on the brotli decoder of the .NET runtime (System.IO.Compression).</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Spillgate\Spillgate.csproj" />
+    <InternalsVisibleTo Include="Spillgate.Tests" />
+  </ItemGroup>
+</Project>

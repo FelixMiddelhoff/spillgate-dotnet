@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <RepoRoot>$(MSBuildThisFileDirectory)</RepoRoot>
+  </PropertyGroup>
+</Project>
