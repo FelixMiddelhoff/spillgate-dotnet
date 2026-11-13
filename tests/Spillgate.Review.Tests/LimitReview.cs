@@ -14,9 +14,15 @@ public sealed class LimitReview
     {
         int idx = 0;
         foreach (string mode in R.Modes)
+        {
             for (int f = 0; f < 6; f++)
+            {
                 for (int d = -1; d <= 1; d++)
+                {
                     yield return new object[] { mode, f, d, idx++ };
+                }
+            }
+        }
     }
 
     [Theory, MemberData(nameof(Matrix))]
@@ -65,7 +71,10 @@ public sealed class LimitReview
     public void InvalidLimitsAreRejectedAtBuild()
     {
         foreach (long bad in new[] { 0L, -1, long.MinValue })
+        {
             Assert.Equal(ErrorKind.InvalidLimits, Assert.Throws<SpillgateException>(() => Decoder.Create(Limits.Create(bad))).Kind);
+        }
+
         Assert.Throws<SpillgateException>(() => Decoder.Create(Limits.Create(1).WithMaxLayers(0)));
         Assert.Throws<SpillgateException>(() => Decoder.Create(Limits.Create(1).WithMaxLayers(17)));
         Assert.Throws<SpillgateException>(() => Decoder.Create(Limits.Create(1).WithMaxRatio(0)));
@@ -127,7 +136,13 @@ public sealed class LimitReview
         {
             private readonly string _k;
             public Dec(string k) { _k = k; }
-            public void Dispose() { if (_k.Contains("throwing-dispose")) throw new InvalidOperationException("x"); }
+            public void Dispose()
+            {
+                if (_k.Contains("throwing-dispose"))
+                {
+                    throw new InvalidOperationException("x");
+                }
+            }
             public CodecStatus Decode(ReadOnlySpan<byte> input, bool inputEnded, Span<byte> output, out int consumed, out int written)
             {
                 consumed = 0; written = 0;
@@ -157,7 +172,11 @@ public sealed class LimitReview
         Assert.Equal(0, await s.ReadAsync(Memory<byte>.Empty));
         var big = new byte[1 << 20];
         int total = 0, n;
-        while ((n = await s.ReadAsync(big.AsMemory(total, 100))) > 0) total += n;
+        while ((n = await s.ReadAsync(big.AsMemory(total, 100))) > 0)
+        {
+            total += n;
+        }
+
         Assert.Equal(500, total);
         Assert.Equal(0, await s.ReadAsync(big, 0, big.Length));
         Assert.Equal(0, s.Read(Array.Empty<byte>(), 0, 0));

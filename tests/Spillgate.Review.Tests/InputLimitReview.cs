@@ -32,17 +32,23 @@ public sealed class InputLimitReview
             byte[] src = stream.Concat(new byte[extra]).ToArray();
             var seen = new HashSet<string>();
             foreach (int chunk in new[] { 1, 7, 1024, 100000 })
+            {
                 foreach (string mode in R.Modes)
                 {
                     R.Res r = R.Run(R.Dec(1 << 20, l => l.WithMaxInput(maxIn)), new R.Chunked(src, () => chunk), e, mode);
                     Assert.True(r.Err == null || r.Err is SpillgateException);
                     seen.Add(r.ToString());
                 }
+            }
 
             _out.WriteLine($"{enc} len={stream.Length} maxIn={maxIn} extraSource={extra}: {string.Join(" | ", seen)}");
             Assert.Single(seen);
             R.Res one = R.Run(R.Dec(1 << 20, l => l.WithMaxInput(maxIn)), new MemoryStream(src), e, "readbig");
-            if (delta >= 0 && extra == 0) Assert.Null(one.Err);
+            if (delta >= 0 && extra == 0)
+            {
+                Assert.Null(one.Err);
+            }
+
             if (delta < 0)
             {
                 var se = Assert.IsType<SpillgateException>(one.Err);

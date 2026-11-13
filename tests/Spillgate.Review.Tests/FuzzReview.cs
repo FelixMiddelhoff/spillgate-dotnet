@@ -108,11 +108,30 @@ public sealed class FuzzReview
             while (true)
             {
                 int n;
-                if (async) n = st.ReadAsync(buf.AsMemory(), CancellationToken.None).AsTask().GetAwaiter().GetResult();
-                else if (mode == 0) n = st.Read(buf, 0, rs);
-                else if (mode == 1) n = st.Read(buf.AsSpan());
-                else { int b = st.ReadByte(); n = b < 0 ? 0 : 1; if (n == 1) buf[0] = (byte)b; }
-                if (n == 0) break;
+                if (async)
+                {
+                    n = st.ReadAsync(buf.AsMemory(), CancellationToken.None).AsTask().GetAwaiter().GetResult();
+                }
+                else if (mode == 0)
+                {
+                    n = st.Read(buf, 0, rs);
+                }
+                else if (mode == 1)
+                {
+                    n = st.Read(buf.AsSpan());
+                }
+                else
+                {
+                    int b = st.ReadByte(); n = b < 0 ? 0 : 1; if (n == 1)
+                    {
+                        buf[0] = (byte)b;
+                    }
+                }
+                if (n == 0)
+                {
+                    break;
+                }
+
                 ms.Write(buf, 0, n);
             }
         }
@@ -138,8 +157,16 @@ public sealed class FuzzReview
             bool ratio = rnd.Next(5) == 0;
             Decoder d = R.Dec(max, l =>
             {
-                if (maxIn is { } mi) l = l.WithMaxInput(mi);
-                if (ratio) l = l.WithMaxRatio(20).WithRatioGrace(0);
+                if (maxIn is { } mi)
+                {
+                    l = l.WithMaxInput(mi);
+                }
+
+                if (ratio)
+                {
+                    l = l.WithMaxRatio(20).WithRatioGrace(0);
+                }
+
                 return l;
             });
             R.Res reference = RunOne(d, m, enc, new Random(7), false);
@@ -154,17 +181,30 @@ public sealed class FuzzReview
                 Compare(failures, tag + $" v{v}", reference, other, ratio);
             }
         });
-        foreach (var kv in kinds.OrderBy(k => k.Key)) _out.WriteLine($"{codec}: {kv.Key} = {kv.Value}");
+        foreach (var kv in kinds.OrderBy(k => k.Key))
+        {
+            _out.WriteLine($"{codec}: {kv.Key} = {kv.Value}");
+        }
+
         Assert.True(failures.IsEmpty, string.Join("\n", failures.Take(12)));
     }
 
     private static void Check(ConcurrentQueue<string> f, string tag, R.Res r, long max)
     {
-        if (r.Data.Length > max) f.Enqueue(tag + " delivered over MaxOutput: " + r.Data.Length);
+        if (r.Data.Length > max)
+        {
+            f.Enqueue(tag + " delivered over MaxOutput: " + r.Data.Length);
+        }
+
         if (r.Err != null && r.Err is not SpillgateException && r.Err is not OperationCanceledException)
+        {
             f.Enqueue(tag + " foreign exception " + r.Err.GetType().FullName + ": " + r.Err.Message);
+        }
+
         if (r.Err is SpillgateException { Kind: ErrorKind.Internal } ie)
+        {
             f.Enqueue(tag + " Internal error: " + ie.Message);
+        }
     }
 
     private static void Compare(ConcurrentQueue<string> f, string tag, R.Res a, R.Res b, bool ratio)
@@ -172,16 +212,27 @@ public sealed class FuzzReview
         string ka = a.Err is SpillgateException x ? x.Kind.ToString() : (a.Err == null ? "ok" : a.Err.GetType().Name);
         string kb = b.Err is SpillgateException y ? y.Kind.ToString() : (b.Err == null ? "ok" : b.Err.GetType().Name);
         bool prefix = a.Data.Length <= b.Data.Length ? b.Data.AsSpan(0, a.Data.Length).SequenceEqual(a.Data) : a.Data.AsSpan(0, b.Data.Length).SequenceEqual(b.Data);
-        if (ratio && (ka == "RatioLimit" || kb == "RatioLimit") && prefix) return; // RDR-01: ratio near threshold may flip with step sizes
+        if (ratio && (ka == "RatioLimit" || kb == "RatioLimit") && prefix)
+        {
+            return; // RDR-01: ratio near threshold may flip with step sizes
+        }
+
         if (ka != kb) { f.Enqueue($"{tag} outcome differs: {ka} ({a.Data.Length}B) vs {kb} ({b.Data.Length}B)"); return; }
         if (ka == "RatioLimit")
         {
             int n = Math.Min(a.Data.Length, b.Data.Length);
-            if (!a.Data.AsSpan(0, n).SequenceEqual(b.Data.AsSpan(0, n))) f.Enqueue(tag + " ratio prefix bytes differ");
+            if (!a.Data.AsSpan(0, n).SequenceEqual(b.Data.AsSpan(0, n)))
+            {
+                f.Enqueue(tag + " ratio prefix bytes differ");
+            }
+
             return;
         }
 
-        if (!a.Data.AsSpan().SequenceEqual(b.Data)) f.Enqueue($"{tag} delivered bytes differ: {ka} {a.Data.Length}B vs {b.Data.Length}B");
+        if (!a.Data.AsSpan().SequenceEqual(b.Data))
+        {
+            f.Enqueue($"{tag} delivered bytes differ: {ka} {a.Data.Length}B vs {b.Data.Length}B");
+        }
     }
 
     [Fact] public void Gzip() => Fuzz("gzip", 1);

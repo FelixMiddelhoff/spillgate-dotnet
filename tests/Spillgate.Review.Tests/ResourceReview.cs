@@ -36,7 +36,10 @@ public sealed class ResourceReview
                 using DecodedStream s = d.Open(new MemoryStream(input), enc);
                 var buf = new byte[65536];
                 int n;
-                while ((n = s.Read(buf, 0, buf.Length)) > 0) delivered += n;
+                while ((n = s.Read(buf, 0, buf.Length)) > 0)
+                {
+                    delivered += n;
+                }
             }
             catch (SpillgateException e) { outcome = e.Kind.ToString(); }
 
@@ -48,7 +51,11 @@ public sealed class ResourceReview
         string line = $"{name}: input={input.Length}B time={one.Item1:F1}ms {one.Item2:F0}ns/inputByte alloc={one.Item3 / 1024}KiB delivered={one.Item4}B outcome={one.Item5}";
         _out.WriteLine(line);
         string? path = Environment.GetEnvironmentVariable("SPILLGATE_REVIEW_OUT");
-        if (!string.IsNullOrEmpty(path)) File.AppendAllText(path, line + "\n");
+        if (!string.IsNullOrEmpty(path))
+        {
+            File.AppendAllText(path, line + "\n");
+        }
+
         return one;
     }
 
@@ -60,17 +67,29 @@ public sealed class ResourceReview
     {
         int[] order = { 1, 2, 3, 4, 0, 5, 17, 6, 16, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
         if (shape == "single") { w.Bits(1, 2); w.Bits(0, 2); w.Bits(0x41, 8); }
-        else if (shape == "four") { w.Bits(1, 2); w.Bits(3, 2); foreach (int s in new[] { 0x41, 0x42, 0x43, 0x44 }) w.Bits(s, 8); w.Bits(0, 1); }
+        else if (shape == "four") { w.Bits(1, 2); w.Bits(3, 2); foreach (int s in new[] { 0x41, 0x42, 0x43, 0x44 }) { w.Bits(s, 8); } w.Bits(0, 1); }
         else
         {
             w.Bits(0, 2);
             foreach (int symbol in order)
             {
-                if (symbol == 8 || symbol == 9) { w.Bits(7, 4); if (symbol == 9) break; }
-                else w.Bits(0, 2);
+                if (symbol == 8 || symbol == 9)
+                {
+                    w.Bits(7, 4); if (symbol == 9)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    w.Bits(0, 2);
+                }
             }
 
-            for (int i = 0; i < 256; i++) w.Bits(0, 1);
+            for (int i = 0; i < 256; i++)
+            {
+                w.Bits(0, 1);
+            }
         }
     }
 
@@ -88,8 +107,16 @@ public sealed class ResourceReview
                 w.Bits(1, 1); w.Bits(7, 3); w.Bits(127, 7);
                 w.Bits(0, 1); w.Bits(1, 2); w.Bits(0, 2); w.Bits(0, 8); w.Bits(0, 1);
             }
-            else w.Bits(0, 1);
-            for (int t = 0; t < 256; t++) LiteralTree(w, shape);
+            else
+            {
+                w.Bits(0, 1);
+            }
+
+            for (int t = 0; t < 256; t++)
+            {
+                LiteralTree(w, shape);
+            }
+
             w.Bits(1, 2); w.Bits(0, 2); w.Bits(8, 10);
             for (int t = 0; t < (distanceTrees ? 256 : 1); t++) { w.Bits(1, 2); w.Bits(0, 2); w.Bits(0, 6); }
             w.Bits(0, shape == "single" ? 0 : shape == "four" ? 2 : 8);
@@ -109,9 +136,21 @@ public sealed class ResourceReview
             w.Bits(0, 1); w.Bits(0, 2); w.Bits(0, 16); w.Bits(0, 1);
             Bt();
             w.Bits(0, 1);
-            if (dist) Bt(); else w.Bits(0, 1);
+            if (dist)
+            {
+                Bt();
+            }
+            else
+            {
+                w.Bits(0, 1);
+            }
+
             w.Bits(0, 2); w.Bits(0, 4);
-            for (int t = 0; t < 256; t++) w.Bits(0, 2);
+            for (int t = 0; t < 256; t++)
+            {
+                w.Bits(0, 2);
+            }
+
             w.Bits(0, 1); w.Bits(0, 1);
             w.Bits(1, 2); w.Bits(0, 2); w.Bits(0x41, 8);
             w.Bits(1, 2); w.Bits(0, 2); w.Bits(8, 10);
@@ -152,20 +191,32 @@ public sealed class ResourceReview
     {
         var ms = new MemoryStream();
         byte[] skip = Generators.ZstdSkippable(0);
-        for (int i = 0; i < 1_000_000; i++) ms.Write(skip);
+        for (int i = 0; i < 1_000_000; i++)
+        {
+            ms.Write(skip);
+        }
+
         var r = Measure("zstd 1,000,000 empty skippable frames", ms.ToArray(), "zstd", Big());
         Assert.True(r.ms < 30_000);
 
         ms = new MemoryStream();
         byte[] empty = Generators.ZstdStored(Array.Empty<byte>(), 10);
         _out.WriteLine("empty frame bytes=" + empty.Length);
-        for (int i = 0; i < 300_000; i++) ms.Write(empty);
+        for (int i = 0; i < 300_000; i++)
+        {
+            ms.Write(empty);
+        }
+
         r = Measure("zstd 300,000 empty frames (window 1 KiB)", ms.ToArray(), "zstd", Big());
         Assert.True(r.ms < 30_000);
 
         byte[] one = Generators.ZstdStored(new byte[] { 1 }, 27);
         ms = new MemoryStream();
-        for (int i = 0; i < 100_000; i++) ms.Write(one);
+        for (int i = 0; i < 100_000; i++)
+        {
+            ms.Write(one);
+        }
+
         r = Measure("zstd 100,000 one-byte frames declaring a 128 MiB window (windowLog 27, cap 8 MiB)", ms.ToArray(), "zstd", Big());
         Assert.True(r.ms < 30_000);
     }
@@ -202,7 +253,11 @@ public sealed class ResourceReview
     {
         byte[] member = Generators.GzipStored(Array.Empty<byte>());
         var ms = new MemoryStream();
-        for (int i = 0; i < 1_000_000; i++) ms.Write(member);
+        for (int i = 0; i < 1_000_000; i++)
+        {
+            ms.Write(member);
+        }
+
         var r = Measure($"gzip 1,000,000 empty members ({member.Length}B each)", ms.ToArray(), "gzip", Big());
         Assert.True(r.ms < 60_000);
 
@@ -226,8 +281,15 @@ public sealed class ResourceReview
         var w = new BitWriter();
         int[] lens = new int[316];
         for (int i = 0; i < 286; i++)
+        {
             lens[i] = i < 144 ? 8 : i < 148 ? 8 : i < 256 ? 9 : i < 280 ? 7 : 8;
-        lens = lens.Take(316).ToArray(); for (int i = 286; i < 316; i++) lens[i] = i < 288 ? 4 : 5;
+        }
+
+        lens = lens.Take(316).ToArray(); for (int i = 286; i < 316; i++)
+        {
+            lens[i] = i < 288 ? 4 : 5;
+        }
+
         for (int b = 0; b < count; b++)
         {
             w.Bits(b == count - 1 ? 1 : 0, 1);
@@ -236,10 +298,33 @@ public sealed class ResourceReview
             w.Bits(29, 5);
             w.Bits(8, 4); // 12 code-length code lengths
             int[] clOrder = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4 };
-            foreach (int sym in clOrder) w.Bits(sym is 8 or 7 or 5 ? 2 : sym is 9 or 4 ? 3 : 0, 3);
+            foreach (int sym in clOrder)
+            {
+                w.Bits(sym is 8 or 7 or 5 ? 2 : sym is 9 or 4 ? 3 : 0, 3);
+            }
+
             foreach (int l in lens)
             {
-                if (l == 5) w.Code(0, 2); else if (l == 7) w.Code(1, 2); else if (l == 8) w.Code(2, 2); else if (l == 4) w.Code(6, 3); else w.Code(7, 3);
+                if (l == 5)
+                {
+                    w.Code(0, 2);
+                }
+                else if (l == 7)
+                {
+                    w.Code(1, 2);
+                }
+                else if (l == 8)
+                {
+                    w.Code(2, 2);
+                }
+                else if (l == 4)
+                {
+                    w.Code(6, 3);
+                }
+                else
+                {
+                    w.Code(7, 3);
+                }
             }
 
             w.Code(0, 7); // EOB: first canonical code of length 7

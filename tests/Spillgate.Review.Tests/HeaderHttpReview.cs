@@ -90,19 +90,34 @@ public sealed class HeaderHttpReview
                     while (true)
                     {
                         int n = s.Read(buf, 0, buf.Length);
-                        if (n == 0) break;
+                        if (n == 0)
+                        {
+                            break;
+                        }
+
                         total += n;
-                        if (total > (1 << 20)) bad.Enqueue("over limit");
+                        if (total > (1 << 20))
+                        {
+                            bad.Enqueue("over limit");
+                        }
                     }
                 }
                 catch (ObjectDisposedException) { }
                 catch (SpillgateException) { }
                 catch (Exception e) { bad.Enqueue(e.GetType().FullName + ": " + e.Message); }
             });
-            if (mode != 0) Thread.Sleep(rnd.Next(0, 3));
+            if (mode != 0)
+            {
+                Thread.Sleep(rnd.Next(0, 3));
+            }
+
             if (mode == 1) { s.Dispose(); s.Dispose(); }
             if (mode == 2) { s.DisposeAsync().AsTask().Wait(); s.Dispose(); }
-            if (!t.Wait(20000)) bad.Enqueue("hang");
+            if (!t.Wait(20000))
+            {
+                bad.Enqueue("hang");
+            }
+
             s.Dispose();
             Assert.Throws<ObjectDisposedException>(() => s.Read(new byte[1], 0, 1));
         });
@@ -150,7 +165,11 @@ public sealed class HeaderHttpReview
         public override void Flush() { }
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (_p >= 20) throw _e;
+            if (_p >= 20)
+            {
+                throw _e;
+            }
+
             int n = Math.Min(count, Math.Min(5, _d.Length - _p)); Array.Copy(_d, _p, buffer, offset, n); _p += n; return n;
         }
         public override long Seek(long offset, SeekOrigin origin) => 0;
@@ -189,7 +208,11 @@ public sealed class HeaderHttpReview
             async Task<(int, string)> Post(string path, byte[] body, params string[] ce)
             {
                 var req = new HttpRequestMessage(HttpMethod.Post, url + path) { Content = new ByteArrayContent(body) };
-                foreach (string v in ce) req.Content.Headers.TryAddWithoutValidation("Content-Encoding", v);
+                foreach (string v in ce)
+                {
+                    req.Content.Headers.TryAddWithoutValidation("Content-Encoding", v);
+                }
+
                 for (int attempt = 0; ; attempt++)
                 {
                     try
@@ -270,7 +293,11 @@ public sealed class HeaderHttpReview
     private static HttpContent Clone(HttpContent c)
     {
         var n = new ByteArrayContent(c.ReadAsByteArrayAsync().GetAwaiter().GetResult());
-        foreach (var h in c.Headers) n.Headers.TryAddWithoutValidation(h.Key, h.Value);
+        foreach (var h in c.Headers)
+        {
+            n.Headers.TryAddWithoutValidation(h.Key, h.Value);
+        }
+
         return n;
     }
 

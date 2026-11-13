@@ -29,7 +29,11 @@ public static class R
     public static Decoder Dec(long max, Func<Limits, Limits>? cfg = null)
     {
         Limits l = Limits.Create(max);
-        if (cfg != null) l = cfg(l);
+        if (cfg != null)
+        {
+            l = cfg(l);
+        }
+
         return Decoder.CreateBuilder(l).AddBrotli().AddZstd().Build();
     }
 
@@ -38,13 +42,17 @@ public static class R
         var rnd = new Random(seed);
         string[] w = { "alpha", "beta", "gamma", "delta", "spill", "gate", "limit", "stream", "byte", "zip" };
         var sb = new StringBuilder();
-        while (sb.Length < n) sb.Append(w[rnd.Next(w.Length)]).Append(rnd.Next(1000)).Append(' ');
+        while (sb.Length < n)
+        {
+            sb.Append(w[rnd.Next(w.Length)]).Append(rnd.Next(1000)).Append(' ');
+        }
+
         return Encoding.ASCII.GetBytes(sb.ToString(0, n));
     }
 
-    public static byte[] Gzip(byte[] p) { var m = new MemoryStream(); using (var g = new GZipStream(m, CompressionLevel.Optimal, true)) g.Write(p); return m.ToArray(); }
-    public static byte[] Zlib(byte[] p) { var m = new MemoryStream(); using (var g = new ZLibStream(m, CompressionLevel.Optimal, true)) g.Write(p); return m.ToArray(); }
-    public static byte[] Deflate(byte[] p) { var m = new MemoryStream(); using (var g = new DeflateStream(m, CompressionLevel.Optimal, true)) g.Write(p); return m.ToArray(); }
+    public static byte[] Gzip(byte[] p) { var m = new MemoryStream(); using (var g = new GZipStream(m, CompressionLevel.Optimal, true)) { g.Write(p); } return m.ToArray(); }
+    public static byte[] Zlib(byte[] p) { var m = new MemoryStream(); using (var g = new ZLibStream(m, CompressionLevel.Optimal, true)) { g.Write(p); } return m.ToArray(); }
+    public static byte[] Deflate(byte[] p) { var m = new MemoryStream(); using (var g = new DeflateStream(m, CompressionLevel.Optimal, true)) { g.Write(p); } return m.ToArray(); }
     public static byte[] Br(byte[] p) { var o = new byte[BrotliEncoder.GetMaxCompressedLength(p.Length) + 16]; BrotliEncoder.TryCompress(p, o, out int w, 6, 22); return o.AsSpan(0, w).ToArray(); }
 
     public static (byte[] stream, string enc)[] Forms(byte[] p) => new[]
@@ -86,16 +94,16 @@ public static class R
             s = d.Open(src, enc);
             switch (mode)
             {
-                case "read1": { var b = new byte[1]; int n; while ((n = s.Read(b, 0, 1)) > 0) ms.Write(b, 0, n); break; }
-                case "readbig": { var b = new byte[1 << 20]; int n; while ((n = s.Read(b, 0, b.Length)) > 0) ms.Write(b, 0, n); break; }
-                case "readbigcount": { var b = new byte[16]; int n; while ((n = s.Read(b, 0, 16)) > 0) ms.Write(b, 0, n); break; }
-                case "span7": { var b = new byte[7]; int n; while ((n = s.Read(b.AsSpan())) > 0) ms.Write(b, 0, n); break; }
-                case "readbyte": { int c; while ((c = s.ReadByte()) >= 0) ms.WriteByte((byte)c); break; }
+                case "read1": { var b = new byte[1]; int n; while ((n = s.Read(b, 0, 1)) > 0) { ms.Write(b, 0, n); } break; }
+                case "readbig": { var b = new byte[1 << 20]; int n; while ((n = s.Read(b, 0, b.Length)) > 0) { ms.Write(b, 0, n); } break; }
+                case "readbigcount": { var b = new byte[16]; int n; while ((n = s.Read(b, 0, 16)) > 0) { ms.Write(b, 0, n); } break; }
+                case "span7": { var b = new byte[7]; int n; while ((n = s.Read(b.AsSpan())) > 0) { ms.Write(b, 0, n); } break; }
+                case "readbyte": { int c; while ((c = s.ReadByte()) >= 0) { ms.WriteByte((byte)c); } break; }
                 case "copyto": s.CopyTo(ms); break;
                 case "copytoasync": s.CopyToAsync(ms, 77).GetAwaiter().GetResult(); break;
-                case "readasyncmem": { var b = new byte[100000]; int n; while ((n = s.ReadAsync(b.AsMemory(), CancellationToken.None).AsTask().GetAwaiter().GetResult()) > 0) ms.Write(b, 0, n); break; }
-                case "readasyncarr": { var b = new byte[333]; int n; while ((n = s.ReadAsync(b, 0, b.Length).GetAwaiter().GetResult()) > 0) ms.Write(b, 0, n); break; }
-                case "zeromix": { var b = new byte[50]; int n; while (true) { s.Read(b, 0, 0); n = s.Read(b, 0, 50); if (n == 0) break; ms.Write(b, 0, n); } break; }
+                case "readasyncmem": { var b = new byte[100000]; int n; while ((n = s.ReadAsync(b.AsMemory(), CancellationToken.None).AsTask().GetAwaiter().GetResult()) > 0) { ms.Write(b, 0, n); } break; }
+                case "readasyncarr": { var b = new byte[333]; int n; while ((n = s.ReadAsync(b, 0, b.Length).GetAwaiter().GetResult()) > 0) { ms.Write(b, 0, n); } break; }
+                case "zeromix": { var b = new byte[50]; int n; while (true) { s.Read(b, 0, 0); n = s.Read(b, 0, 50); if (n == 0) { break; } ms.Write(b, 0, n); } break; }
             }
         }
         catch (Exception e) { r.Err = e; }
