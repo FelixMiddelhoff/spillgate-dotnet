@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spillgate.Http.Tests", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spillgate.HowTo.Tests", "tests\Spillgate.HowTo.Tests\Spillgate.HowTo.Tests.csproj", "{40A2EF60-E459-444D-91C6-B1B0229C0CF6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Spillgate.Review.Tests", "tests\Spillgate.Review.Tests\Spillgate.Review.Tests.csproj", "{4E072390-2B2D-4C15-9092-4C847E9151C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +159,18 @@ Global
 		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Release|x64.Build.0 = Release|Any CPU
 		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Release|x86.ActiveCfg = Release|Any CPU
 		{40A2EF60-E459-444D-91C6-B1B0229C0CF6}.Release|x86.Build.0 = Release|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Debug|x64.Build.0 = Debug|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Debug|x86.Build.0 = Debug|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Release|x64.ActiveCfg = Release|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Release|x64.Build.0 = Release|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Release|x86.ActiveCfg = Release|Any CPU
+		{4E072390-2B2D-4C15-9092-4C847E9151C1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -172,5 +186,6 @@ Global
 		{A202640D-8D20-455A-A7A4-ECAA44F4A761} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{F578181D-C969-417B-A0E7-456BC9EBDF5E} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{40A2EF60-E459-444D-91C6-B1B0229C0CF6} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+		{4E072390-2B2D-4C15-9092-4C847E9151C1} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 	EndGlobalSection
 EndGlobal
