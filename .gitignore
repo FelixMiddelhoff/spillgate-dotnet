@@ -8,3 +8,4 @@ TestResults/
 *.nupkg
 *.snupkg
 .dotnet/
+tests/Spillgate.Tests/canary/
