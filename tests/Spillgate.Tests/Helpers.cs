@@ -141,17 +141,39 @@ public static class T
 
     // -- compression through the runtime (the oracle for valid streams) --------------------------------------
 
+    // .NET 10 writes nothing at all when an empty input is compressed; the valid empty streams are fixed here.
     public static byte[] Gzip(byte[] data, CompressionLevel level = CompressionLevel.Optimal) =>
-        Through(data, s => new GZipStream(s, level, leaveOpen: true));
+        data.Length == 0
+            ? new byte[] { 0x1f, 0x8b, 8, 0, 0, 0, 0, 0, 0, 0xff, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+            : Through(data, s => new GZipStream(s, level, leaveOpen: true));
 
     public static byte[] ZLib(byte[] data, CompressionLevel level = CompressionLevel.Optimal) =>
-        Through(data, s => new ZLibStream(s, level, leaveOpen: true));
+        data.Length == 0
+            ? new byte[] { 0x78, 0x9c, 3, 0, 0, 0, 0, 1 }
+            : Through(data, s => new ZLibStream(s, level, leaveOpen: true));
 
     public static byte[] RawDeflate(byte[] data, CompressionLevel level = CompressionLevel.Optimal) =>
-        Through(data, s => new DeflateStream(s, level, leaveOpen: true));
+        data.Length == 0
+            ? new byte[] { 3, 0 }
+            : Through(data, s => new DeflateStream(s, level, leaveOpen: true));
 
-    public static byte[] Brotli(byte[] data, CompressionLevel level = CompressionLevel.Optimal) =>
-        Through(data, s => new BrotliStream(s, level, leaveOpen: true));
+    public static byte[] Brotli(byte[] data, CompressionLevel level = CompressionLevel.Optimal)
+    {
+        int quality = level switch
+        {
+            CompressionLevel.NoCompression => 0,
+            CompressionLevel.Fastest => 1,
+            CompressionLevel.SmallestSize => 11,
+            _ => 5,
+        };
+        var dest = new byte[BrotliEncoder.GetMaxCompressedLength(data.Length) + 16];
+        if (!BrotliEncoder.TryCompress(data, dest, out int written, quality, 22))
+        {
+            throw new InvalidOperationException("brotli compression failed");
+        }
+
+        return dest.AsSpan(0, written).ToArray();
+    }
 
     public static byte[] Through(byte[] data, Func<Stream, Stream> wrap)
     {

@@ -39,11 +39,25 @@ public sealed class BrotliCodec : ICodec
     /// <inheritdoc />
     public ICodecDecoder CreateDecoder() => new Adapter(_maxWindowBits);
 
-    private sealed class Adapter : ICodecDecoder, IFailureAccounting
+    private sealed class Adapter : ICodecDecoder, IFailureAccounting, IProbeAware
     {
+        /// <summary>
+        /// The decoder gets its input in steps of exactly this many bytes (plus the end of the input and the
+        /// MaxInput boundary). The native decoder flushes output when it runs out of input and loses what it decoded in
+        /// a call that fails, so how the stream is cut into calls decides which bytes are delivered before an error.
+        /// Cutting it at fixed offsets makes the result independent of the source's chunking (SG-I-09).
+        /// </summary>
+        private const int Step = 1024;
+
         private readonly int _maxWindowBits;
+        private readonly byte[] _stage = new byte[Step];
         private BrotliDecoder _decoder;
         private State _state = State.Start;
+        private int _staged;
+        private bool _feeding;
+        private bool _drain;
+        private bool _trailing;
+        private bool _failed;
 
         internal Adapter(int maxWindowBits)
         {
@@ -57,6 +71,8 @@ public sealed class BrotliCodec : ICodec
             Finished,
         }
 
+        public bool WindowIsProbe { private get; set; }
+
         public int ConsumedBeforeFailure { get; private set; }
 
         public void Dispose() => _decoder.Dispose();
@@ -66,6 +82,16 @@ public sealed class BrotliCodec : ICodec
         {
             consumed = 0;
             written = 0;
+            if (_failed)
+            {
+                throw SpillgateException.Corrupt("brotli: invalid data");
+            }
+
+            if (_trailing)
+            {
+                throw SpillgateException.Corrupt("brotli: unexpected data after the end of the stream");
+            }
+
             if (_state == State.Finished)
             {
                 return CodecStatus.Done;
@@ -87,24 +113,105 @@ public sealed class BrotliCodec : ICodec
                 _state = State.Running;
             }
 
-            OperationStatus status = _decoder.Decompress(input, output, out consumed, out written);
-            switch (status)
+            int taken = 0;
+            for (; ; )
             {
-                case OperationStatus.Done:
-                    _state = State.Finished;
-                    return CodecStatus.Done;
-                case OperationStatus.DestinationTooSmall:
-                    return CodecStatus.Continue;
-                case OperationStatus.NeedMoreData:
-                    if (inputEnded)
+                if (!_feeding && !_drain)
+                {
+                    // The probe byte is looked at, not taken, as long as bytes are waiting to be fed: they may be the
+                    // whole stream (SG-R-INP-01).
+                    if (!(WindowIsProbe && _staged > 0))
                     {
-                        throw SpillgateException.Corrupt("brotli: the stream is truncated");
+                        int n = Math.Min(Step - _staged, input.Length - taken);
+                        input.Slice(taken, n).CopyTo(_stage.AsSpan(_staged));
+                        taken += n;
+                        _staged += n;
                     }
 
+                    bool flush = _staged == Step || inputEnded || (WindowIsProbe && _staged > 0);
+                    if (!flush)
+                    {
+                        consumed = taken;
+                        return CodecStatus.NeedInput;
+                    }
+                }
+
+                int before = _staged;
+                int space = output.Length - written;
+                OperationStatus status = _decoder.Decompress(_stage.AsSpan(0, _staged), output.Slice(written), out int used, out int produced);
+                written += produced;
+                _staged -= used;
+                if (_staged > 0 && used > 0)
+                {
+                    Buffer.BlockCopy(_stage, used, _stage, 0, _staged);
+                }
+
+                _feeding = _staged > 0;
+                // With the output full the decoder may hold more, and then still reports NeedMoreData once its
+                // input is used up: call it again, with no new input, until it leaves space unused.
+                _drain = status == OperationStatus.DestinationTooSmall || (produced == space && space > 0);
+                switch (status)
+                {
+                    case OperationStatus.Done:
+                        _state = State.Finished;
+                        if (_staged > 0)
+                        {
+                            // Bytes behind the end of the stream that were already staged: trailing data. They
+                            // were counted when staged, except what this very call took beyond the stream.
+                            ConsumedBeforeFailure = Math.Max(0, taken - _staged);
+                            if (written == 0)
+                            {
+                                throw SpillgateException.Corrupt("brotli: unexpected data after the end of the stream");
+                            }
+
+                            _trailing = true;
+                            consumed = taken;
+                            return CodecStatus.Continue;
+                        }
+
+                        consumed = taken;
+                        return written > 0 ? CodecStatus.Continue : CodecStatus.Done;
+                    case OperationStatus.DestinationTooSmall:
+                        consumed = taken;
+                        return CodecStatus.Continue;
+                    case OperationStatus.NeedMoreData:
+                        if (written > 0)
+                        {
+                            consumed = taken;
+                            return CodecStatus.Continue;
+                        }
+
+                        if (inputEnded)
+                        {
+                            consumed = taken;
+                            throw SpillgateException.Corrupt("brotli: the stream is truncated");
+                        }
+
+                        if (before == 0)
+                        {
+                            consumed = taken;
+                            return CodecStatus.NeedInput;
+                        }
+
+                        break; // all staged bytes are in; stage more or ask for more
+                    default:
+                        if (written > 0)
+                        {
+                            // What the decoder wrote before it met the fault is delivered first; the fault follows.
+                            _failed = true;
+                            consumed = taken;
+                            return CodecStatus.Continue;
+                        }
+
+                        ConsumedBeforeFailure = Math.Max(0, taken - _staged);
+                        throw SpillgateException.Corrupt("brotli: invalid data");
+                }
+
+                if (taken >= input.Length || WindowIsProbe)
+                {
+                    consumed = taken;
                     return CodecStatus.NeedInput;
-                default:
-                    ConsumedBeforeFailure = consumed;
-                    throw SpillgateException.Corrupt("brotli: invalid data");
+                }
             }
         }
 

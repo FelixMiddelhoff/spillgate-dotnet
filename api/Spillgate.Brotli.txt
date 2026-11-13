@@ -1,0 +1,11 @@
+sealed class Spillgate.Brotli.BrotliCodec : Spillgate.ICodec
+  ICodecDecoder CreateDecoder()
+  static BrotliCodec Create(BrotliOptions options)
+static class Spillgate.Brotli.BrotliDecoderBuilderExtensions
+  static DecoderBuilder AddBrotli(DecoderBuilder builder, BrotliOptions options)
+sealed class Spillgate.Brotli.BrotliOptions
+  property Int32 MaxWindowBits { get; }
+  static BrotliOptions Create(Int32 maxWindowBits)
+  static const field Int32 DefaultMaxWindowBits
+  static const field Int32 MinWindowBits
+  static property BrotliOptions Default { get; }

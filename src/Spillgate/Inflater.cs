@@ -57,6 +57,7 @@ internal sealed class Inflater
     private int _codeLengthBits;
 
     private State _state = State.Header;
+    private SpillgateException? _deferred;
     private ulong _bitBuffer;
     private int _bitCount;
     private bool _lastBlock;
@@ -95,6 +96,7 @@ internal sealed class Inflater
     /// <summary>Starts a new stream. The window content is not cleared; distances are checked against the stream's own length.</summary>
     internal void Reset()
     {
+        _deferred = null;
         _state = State.Header;
         _bitBuffer = 0;
         _bitCount = 0;
@@ -115,6 +117,12 @@ internal sealed class Inflater
     internal CodecStatus Inflate(
         ReadOnlySpan<byte> input, bool inputEnded, Span<byte> output, out int consumed, out int written)
     {
+        if (_deferred is not null)
+        {
+            ConsumedBeforeFailure = 0;
+            throw _deferred;
+        }
+
         int pos = 0;
         int w = 0;
         CodecStatus status;
@@ -522,10 +530,22 @@ internal sealed class Inflater
             written = w;
             return status;
         }
-        catch (SpillgateException)
+        catch (SpillgateException e)
         {
             ConsumedBeforeFailure = pos;
-            throw;
+            if (w == 0)
+            {
+                throw;
+            }
+
+            // Bytes decoded before the fault are delivered first and the fault follows on the next step, so what a
+            // reader receives before an error does not depend on the size of its reads (SG-R-RDR-01).
+            _deferred = e;
+            RememberOutput(output.Slice(0, w));
+            _total += w;
+            consumed = pos;
+            written = w;
+            return CodecStatus.Continue;
         }
     }
 

@@ -31,6 +31,7 @@ internal sealed class LayerGuard : IByteSource
     private Phase _phase = Phase.Running;
     private Exception? _error;
     private bool _codecDone;
+    private bool _probeDrained;
 
     internal LayerGuard(ICodecDecoder codec, InputMeter meter, int layer, EffectiveLimits limits)
     {
@@ -278,13 +279,23 @@ internal sealed class LayerGuard : IByteSource
             return TrailingCheck();
         }
 
-        ReadOnlySpan<byte> window = _meter.Window();
+        // When only the probe byte after MaxInput is left, first let the codec deliver everything it can produce from
+        // the bytes it already holds: the probe is shown, and the output of the step that takes it is dropped
+        // (SG-R-INP-01), so without this the bytes delivered before input_limit would depend on the read sizes.
+        bool probeWindow = _meter.WindowIsProbe;
+        bool drainFirst = probeWindow && !_probeDrained;
+        ReadOnlySpan<byte> window = drainFirst ? default : _meter.Window();
         int shown = window.Length;
-        bool inputEnded = _meter.IsEnded;
+        bool inputEnded = !drainFirst && _meter.IsEnded;
         CodecStatus status = CodecStatus.NeedInput;
         int consumed = 0;
         int produced = 0;
         Exception? problem = null;
+        if (codec is IProbeAware aware)
+        {
+            aware.WindowIsProbe = probeWindow;
+        }
+
         try
         {
             status = codec.Decode(window, inputEnded, output, out consumed, out produced);
@@ -341,6 +352,18 @@ internal sealed class LayerGuard : IByteSource
         if (produced > 0)
         {
             return Attempt.Produced;
+        }
+
+        if (drainFirst)
+        {
+            _probeDrained = true;
+            if (status == CodecStatus.Done)
+            {
+                _codecDone = true;
+                return TrailingCheck();
+            }
+
+            return Attempt.Retry;
         }
 
         if (status == CodecStatus.Done)

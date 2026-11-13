@@ -59,6 +59,9 @@ internal sealed class InputMeter
     /// <summary>Gets a value indicating whether bytes are buffered (the probe byte included).</summary>
     internal bool HasBuffered => _pos < _filled;
 
+    /// <summary>Gets a value indicating whether the window is only the probe byte after MaxInput.</summary>
+    internal bool WindowIsProbe => _maxInput > 0 && _consumed >= _maxInput && _pos < _filled;
+
     /// <summary>Gets a value indicating whether the buffer is empty and the source may still have bytes.</summary>
     internal bool NeedsFill => _pos >= _filled && !_ended && FetchSize() > 0;
 

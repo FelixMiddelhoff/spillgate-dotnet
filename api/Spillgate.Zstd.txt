@@ -1,0 +1,10 @@
+sealed class Spillgate.Zstd.ZstdCodec : Spillgate.ICodec
+  ICodecDecoder CreateDecoder()
+  static ZstdCodec Create(ZstdOptions options)
+static class Spillgate.Zstd.ZstdDecoderBuilderExtensions
+  static DecoderBuilder AddZstd(DecoderBuilder builder, ZstdOptions options)
+sealed class Spillgate.Zstd.ZstdOptions
+  property Int64 MaxWindowBytes { get; }
+  static ZstdOptions Create(Int64 maxWindowBytes)
+  static const field Int64 DefaultMaxWindowBytes
+  static property ZstdOptions Default { get; }

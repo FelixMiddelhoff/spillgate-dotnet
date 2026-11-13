@@ -1,0 +1,70 @@
+enum Spillgate.CodecStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  field Int32 value__
+  static const field CodecStatus Continue
+  static const field CodecStatus Done
+  static const field CodecStatus NeedInput
+sealed class Spillgate.DecodedStream : System.IAsyncDisposable, System.IDisposable, System.IO.Stream
+  Int32 Read(Byte[] buffer, Int32 offset, Int32 count)
+  Int32 Read(Span`1 buffer)
+  Int32 ReadByte()
+  Int64 Seek(Int64 offset, SeekOrigin origin)
+  Task`1 ReadAsync(Byte[] buffer, Int32 offset, Int32 count, CancellationToken cancellationToken)
+  ValueTask`1 ReadAsync(Memory`1 buffer, CancellationToken cancellationToken)
+  Void Flush()
+  Void SetLength(Int64 value)
+  Void Write(Byte[] buffer, Int32 offset, Int32 count)
+  property Boolean CanRead { get; }
+  property Boolean CanSeek { get; }
+  property Boolean CanWrite { get; }
+  property Int64 Length { get; }
+  property Int64 Position { get; set; }
+  protected Void Dispose(Boolean disposing)
+sealed class Spillgate.Decoder
+  Byte[] DecodeAll(Stream source, IEnumerable`1 contentEncoding, CancellationToken cancellationToken)
+  Byte[] DecodeAll(Stream source, String[] contentEncoding)
+  DecodedStream Open(Stream source, IEnumerable`1 contentEncoding, Boolean leaveOpen, CancellationToken cancellationToken)
+  DecodedStream Open(Stream source, String[] contentEncoding)
+  ValueTask`1 DecodeAllAsync(Stream source, IEnumerable`1 contentEncoding, CancellationToken cancellationToken)
+  static Decoder Create(Limits limits)
+  static DecoderBuilder CreateBuilder(Limits limits)
+sealed class Spillgate.DecoderBuilder
+  Decoder Build()
+  DecoderBuilder AddCodec(String name, ICodec codec)
+  DecoderBuilder WithStrictZlib(Boolean strict)
+enum Spillgate.ErrorKind : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  field Int32 value__
+  static const field ErrorKind Canceled
+  static const field ErrorKind Corrupt
+  static const field ErrorKind InputLimit
+  static const field ErrorKind Internal
+  static const field ErrorKind InvalidLimits
+  static const field ErrorKind InvalidOption
+  static const field ErrorKind LayerLimit
+  static const field ErrorKind MalformedEncoding
+  static const field ErrorKind MemoryLimit
+  static const field ErrorKind OutputLimit
+  static const field ErrorKind RatioLimit
+  static const field ErrorKind SourceError
+  static const field ErrorKind UnsupportedEncoding
+static class Spillgate.ErrorKindExtensions
+  static Int32 HttpStatus(ErrorKind kind)
+  static String SpecName(ErrorKind kind)
+interface Spillgate.ICodec
+  virtual ICodecDecoder CreateDecoder()
+interface Spillgate.ICodecDecoder : System.IDisposable
+  virtual CodecStatus Decode(ReadOnlySpan`1 input, Boolean inputEnded, Span`1 output, Int32& consumed, Int32& written)
+sealed class Spillgate.Limits
+  Limits WithMaxInput(Int64 bytes)
+  Limits WithMaxLayers(Int32 layers)
+  Limits WithMaxRatio(Int64 ratio)
+  Limits WithRatioGrace(Int64 bytes)
+  Limits WithoutRatioLimit()
+  String ToString()
+  static Limits Create(Int64 maxOutput)
+sealed class Spillgate.SpillgateException : System.IO.IOException, System.Runtime.Serialization.ISerializable
+  ctor(ErrorKind kind, String message)
+  ctor(ErrorKind kind, String message, Exception innerException)
+  property ErrorKind Kind { get; }
+  property Int32 Layer { get; }
+  property Int64 Limit { get; }
+  property String Message { get; }
