@@ -40,4 +40,4 @@ reportable bypass.
 Out of scope: the compressed size (unless `MaxInput` is set), timeouts and CPU of code after decoding,
 archive formats (zip, tar, 7z), and encryption.
 
-Run patched .NET runtimes; `docs/threat-model.md` lists the servicing releases that matter for brotli.
+Run patched .NET runtimes: brotli CVE-2026-111497 (GHSA-p3jp-9v83-76w9) is fixed in 8.0.33, 9.0.22 and 10.0.14; ASP.NET Core CVE-2026-69304 has the floors 8.0.31, 9.0.20 and 10.0.12 (confirmed by secondary sources only). `docs/threat-model.md` has the details.

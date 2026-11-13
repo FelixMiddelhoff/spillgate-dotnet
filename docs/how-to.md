@@ -116,7 +116,9 @@ public static WebApplication BuildServer()
 }
 ```
 
-The middleware decodes bodies that carry a `Content-Encoding` and answers 413 (a limit), 415 (unsupported encoding) or 400 (malformed or corrupt data) without echoing anything the client sent. It also catches failures that frameworks swallow while binding a body (the minimal API answers 400 by itself): as long as nothing was sent yet, the status becomes the right one. Requests without `Content-Encoding` pass through; the server's own body size limit applies to them. Put the middleware before routing-dependent code that reads the body.
+The middleware decodes bodies that carry a `Content-Encoding` and answers 413 (a limit), 415 (unsupported encoding) or 400 (malformed or corrupt data) without echoing anything the client sent. It also catches failures that frameworks swallow while binding a body (the minimal API answers 400 by itself): as long as nothing was sent yet, the status becomes the right one. Requests without `Content-Encoding` and requests without a body (`Content-Length: 0`) pass through; the server's own body size limit applies to them. Put the middleware before routing-dependent code that reads the body.
+
+The status can only be corrected while nothing has been sent. If the handler swallows the failed read and has already started the response (for example it wrote a 200 and headers, or streamed output), the middleware can no longer turn the failure into 413: it aborts the connection, and what the client sees then depends on the timing. Read the whole body first and respond second, and treat an aborted connection as a rejected request.
 
 ### Any other source: files, object storage, queues
 
@@ -282,7 +284,8 @@ Search your code and your dependencies for: `GZipStream`, `DeflateStream`, `ZLib
 - `AutomaticDecompression` set on a handler under `SpillgateHandler` is refused at construction or on the first request; do not work around it.
 - Do not read the decoded stream with `ReadAsByteArrayAsync` on a stream that has no limit: the limit lives in the decoder, so the whole-body call is safe only on a stream that came from it.
 - The compressed input is not limited unless you set `MaxInput` or a server body size limit.
-- Brotli inside the runtime is native code. Run patched runtimes (see `docs/threat-model.md`).
+- Brotli inside the runtime is native code. Run patched runtimes: the brotli out-of-bounds write CVE-2026-111497 (GHSA-p3jp-9v83-76w9) is fixed in .NET 8.0.33, 9.0.22 and 10.0.14, and the ASP.NET Core decompression denial of service CVE-2026-69304 has the floors 8.0.31, 9.0.20 and 10.0.12 (see `docs/threat-model.md`). Spillgate does not check the runtime version; without a patched runtime, do not register brotli.
+- Bodyless messages are not decoded: a response to HEAD, a 1xx, 204 or 304 response, a response with `Content-Length: 0` and a request with `Content-Length: 0` read as empty even if `Content-Encoding` is present.
 - A decoded stream is forward-only and not thread safe for concurrent reads; the `Decoder` is.
 
 ## 8. Checklist before you ship
@@ -292,4 +295,4 @@ Search your code and your dependencies for: `GZipStream`, `DeflateStream`, `ZLib
 - [ ] Every ingress maps failures to 413, 415 or 400 and never echoes request data.
 - [ ] Alerts on `Internal` and `MemoryLimit`.
 - [ ] Bomb, deep chain, unknown encoding, truncation and trailing-byte tests per ingress.
-- [ ] The runtime is on a patched servicing release.
+- [ ] The runtime is on a patched servicing release (brotli: 8.0.33, 9.0.22, 10.0.14 or later).

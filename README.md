@@ -55,7 +55,7 @@ app.UseSpillgateRequestDecoding(decoder);                               // ASP.N
 ## Documents
 
 - [docs/how-to.md](docs/how-to.md): using it in a service
-- [docs/threat-model.md](docs/threat-model.md): what is protected, measured costs, residual risks, runtime patch levels
+- [docs/threat-model.md](docs/threat-model.md): what is protected, measured costs, residual risks, runtime patch levels (brotli needs .NET 8.0.33, 9.0.22 or 10.0.14 or later)
 - [docs/design.md](docs/design.md): design decisions and the .NET traps with the tests that cover them
 - [spec/SPEC.md](spec/SPEC.md) and [conformance/](conformance/SCHEMA.md): the specification and the corpus
 - [SECURITY.md](SECURITY.md), [CONTRIBUTING.md](CONTRIBUTING.md), [CHANGELOG.md](CHANGELOG.md), [RELEASING.md](RELEASING.md)
