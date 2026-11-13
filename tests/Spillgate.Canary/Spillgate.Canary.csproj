@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Spillgate.Canary</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Spillgate\Spillgate.csproj" />
+    <ProjectReference Include="..\..\src\Spillgate.Brotli\Spillgate.Brotli.csproj" />
+    <ProjectReference Include="..\..\src\Spillgate.Zstd\Spillgate.Zstd.csproj" />
+    <ProjectReference Include="..\Spillgate.TestSupport\Spillgate.TestSupport.csproj" />
+  </ItemGroup>
+</Project>

@@ -13,5 +13,12 @@
     <ProjectReference Include="..\..\src\Spillgate.Brotli\Spillgate.Brotli.csproj" />
     <ProjectReference Include="..\..\src\Spillgate.Zstd\Spillgate.Zstd.csproj" />
     <ProjectReference Include="..\Spillgate.TestSupport\Spillgate.TestSupport.csproj" />
+    <ProjectReference Include="..\Spillgate.Canary\Spillgate.Canary.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
+  <Target Name="CopyCanary" AfterTargets="Build">
+    <ItemGroup>
+      <CanaryFiles Include="..\Spillgate.Canary\bin\$(Configuration)\$(TargetFramework)\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(CanaryFiles)" DestinationFolder="$(OutDir)canary\%(RecursiveDir)" />
+  </Target>
 </Project>
